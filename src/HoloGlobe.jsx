@@ -16,7 +16,7 @@ const generateSpherePoints = (count, radius) => {
   return points
 }
 
-const Marker = ({ position, label, value, color = "#3b82f6" }) => {
+const Marker = ({ position, label, value, color = "#3b82f6", isMobile }) => {
     const [hovered, setHover] = useState(false)
     const ref = useRef()
 
@@ -38,24 +38,25 @@ const Marker = ({ position, label, value, color = "#3b82f6" }) => {
             </mesh>
             
             {/* Pulsing Top */}
-            <mesh ref={ref} position={[0, 1.0, 0]} onPointerOver={() => setHover(true)} onPointerOut={() => setHover(false)}>
+            <mesh ref={ref} position={[0, 1.0, 0]} onPointerOver={() => setHover(true)} onPointerOut={() => setHover(false)} onClick={(e) => { if(isMobile) setHover(!hovered) }}>
                 <sphereGeometry args={[0.1, 16, 16]} />
                 <meshBasicMaterial color={hovered ? "white" : color} toneMapped={false} />
             </mesh>
 
             {/* Hover Label */}
             {hovered && (
-                <Html distanceFactor={15}>
+                <Html distanceFactor={isMobile ? 20 : 15}>
                     <div style={{
                         background: 'rgba(0,0,0,0.8)',
                         border: `1px solid ${color}`,
-                        padding: '8px 12px',
+                        padding: isMobile ? '4px 8px' : '8px 12px',
                         borderRadius: '4px',
                         color: 'white',
                         whiteSpace: 'nowrap',
                         fontFamily: 'monospace',
                         pointerEvents: 'none',
-                        transform: 'translate3d(-50%, -150%, 0)'
+                        transform: 'translate3d(-50%, -150%, 0)',
+                        fontSize: isMobile ? '0.7rem' : '1rem'
                     }}>
                         <div style={{ fontWeight: 'bold', color }}>{label}</div>
                         <div style={{ fontSize: '0.8em' }}>TRAFFIC: {value} TB/s</div>
@@ -66,7 +67,7 @@ const Marker = ({ position, label, value, color = "#3b82f6" }) => {
     )
 }
 
-export default function HoloGlobe({ radius = 4, onMarkerClick }) {
+export default function HoloGlobe({ radius = 4, onMarkerClick, isMobile }) {
   const pointsRef = useRef()
   const groupRef = useRef()
   const ring1Ref = useRef()
@@ -153,6 +154,7 @@ export default function HoloGlobe({ radius = 4, onMarkerClick }) {
                 label={m.label} 
                 color={m.color} 
                 value={m.value} 
+                isMobile={isMobile}
                 onClick={(e) => {
                     e.stopPropagation()
                     onMarkerClick && onMarkerClick(v)

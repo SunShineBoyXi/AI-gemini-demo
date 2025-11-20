@@ -1,14 +1,34 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, ContactShadows, Grid } from '@react-three/drei'
 import DumbbellCurl from './DumbbellCurl'
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+      const check = () => setIsMobile(window.innerWidth < 768)
+      check()
+      window.addEventListener('resize', check)
+      return () => window.removeEventListener('resize', check)
+  }, [])
+  return isMobile
+}
+
 function App() {
+  const isMobile = useIsMobile()
+
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#f3f4f6' }}>
-      <Canvas shadows camera={{ position: [0, 0, 10], zoom: 100 }} orthographic>
+      <Canvas 
+        shadows 
+        camera={{ 
+            position: [0, 0, 10], 
+            zoom: isMobile ? 60 : 100 // Zoom out on mobile
+        }} 
+        orthographic
+      >
         {/* Lighting optimized for Cel Shading */}
         <ambientLight intensity={0.9} />
         <directionalLight 
@@ -22,7 +42,9 @@ function App() {
           color="#dbeafe" // Light blue tint
         />
 
-        <DumbbellCurl />
+        <group position={[0, isMobile ? -1 : 0, 0]}> {/* Center better on mobile */}
+            <DumbbellCurl />
+        </group>
 
         {/* Ground Effects */}
         <group position={[0, -2.9, 0]}>
@@ -59,18 +81,26 @@ function App() {
       
       <div style={{
         position: 'absolute',
-        top: '30px',
-        left: '30px',
+        top: isMobile ? '20px' : '30px',
+        left: isMobile ? '20px' : '30px',
         fontFamily: "'Inter', sans-serif",
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        maxWidth: isMobile ? '80%' : 'auto'
       }}>
-        <Link to="/" style={{ color: '#475569', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', pointerEvents: 'auto', marginBottom: '16px', fontSize: '0.9rem', fontWeight: '500' }}>
-            <ArrowLeft size={16} /> Back to Lab
+        <Link to="/" style={{ color: '#475569', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', pointerEvents: 'auto', marginBottom: isMobile ? '10px' : '16px', fontSize: '0.9rem', fontWeight: '500' }}>
+            <ArrowLeft size={16} /> {isMobile ? 'Back' : 'Back to Lab'}
         </Link>
-        <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: '900', letterSpacing: '-0.05em', color: '#0f172a' }}>
+        <h1 style={{ 
+            margin: 0, 
+            fontSize: isMobile ? '1.8rem' : '2.5rem', 
+            fontWeight: '900', 
+            letterSpacing: '-0.05em', 
+            color: '#0f172a',
+            lineHeight: 1.1
+        }}>
           VECTOR CURL
         </h1>
-        <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '5px', flexWrap: 'wrap' }}>
             <span style={{ background: '#3b82f6', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'}}>REACT THREE FIBER</span>
             <span style={{ background: '#0f172a', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'}}>TOON SHADING</span>
         </div>

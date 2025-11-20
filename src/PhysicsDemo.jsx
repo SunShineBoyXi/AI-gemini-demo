@@ -6,6 +6,17 @@ import { ArrowLeft, MousePointer2 } from 'lucide-react'
 import { EffectComposer, Bloom, SSAO } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+      const check = () => setIsMobile(window.innerWidth < 768)
+      check()
+      window.addEventListener('resize', check)
+      return () => window.removeEventListener('resize', check)
+  }, [])
+  return isMobile
+}
+
 // --- Physics Components ---
 
 // 1. The Floor
@@ -85,10 +96,15 @@ const Shooter = () => {
 }
 
 export default function PhysicsDemo() {
-  // Generate a wall of boxes
+  const isMobile = useIsMobile()
+  
+  // Generate a wall of boxes (fewer on mobile for performance)
   const boxes = []
-  for(let x = -4; x <= 4; x++) {
-      for(let y = 0; y < 8; y++) {
+  const rangeX = isMobile ? 2 : 4
+  const rangeY = isMobile ? 6 : 8
+  
+  for(let x = -rangeX; x <= rangeX; x++) {
+      for(let y = 0; y < rangeY; y++) {
           // Random neon colors
           const colors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"]
           const color = colors[Math.floor(Math.random() * colors.length)]
@@ -98,7 +114,7 @@ export default function PhysicsDemo() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#111', cursor: 'crosshair' }}>
-      <Canvas shadows camera={{ position: [0, 0, 12], fov: 50 }}>
+      <Canvas shadows camera={{ position: [0, 0, isMobile ? 16 : 12], fov: 50 }}>
         <color attach="background" args={['#111']} />
         
         <ambientLight intensity={0.5} />
@@ -122,21 +138,22 @@ export default function PhysicsDemo() {
       {/* UI Overlay */}
       <div style={{
         position: 'absolute',
-        top: '30px',
-        left: '30px',
+        top: isMobile ? '20px' : '30px',
+        left: isMobile ? '20px' : '30px',
         color: 'white',
         fontFamily: "'Inter', sans-serif",
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        maxWidth: isMobile ? '80%' : 'auto'
       }}>
-        <Link to="/" style={{ color: '#94a3b8', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', pointerEvents: 'auto', marginBottom: '16px', fontSize: '0.9rem', fontWeight: '500' }}>
-            <ArrowLeft size={16} /> Back to Lab
+        <Link to="/" style={{ color: '#94a3b8', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', pointerEvents: 'auto', marginBottom: isMobile ? '10px' : '16px', fontSize: '0.9rem', fontWeight: '500' }}>
+            <ArrowLeft size={16} /> {isMobile ? 'Back' : 'Back to Lab'}
         </Link>
-        <h1 style={{ margin: 0, fontSize: '3rem', fontWeight: '900', letterSpacing: '-0.02em', color: '#fff' }}>
+        <h1 style={{ margin: 0, fontSize: isMobile ? '2rem' : '3rem', fontWeight: '900', letterSpacing: '-0.02em', color: '#fff', lineHeight: 1 }}>
           CHAOS PHYSICS
         </h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#f59e0b', marginTop: '10px' }}>
           <MousePointer2 size={16} />
-          <span>CLICK ANYWHERE TO SHOOT</span>
+          <span>{isMobile ? 'TAP ANYWHERE TO SHOOT' : 'CLICK ANYWHERE TO SHOOT'}</span>
         </div>
       </div>
     </div>

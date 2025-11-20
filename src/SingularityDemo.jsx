@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react'
+import React, { useRef, useMemo, useState, useEffect } from 'react'
 import { Canvas, useFrame, extend, useThree } from '@react-three/fiber'
 import { OrbitControls, Stars, CameraShake } from '@react-three/drei'
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
@@ -6,6 +6,17 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import * as THREE from 'three'
 import { shaderMaterial } from '@react-three/drei'
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+      const check = () => setIsMobile(window.innerWidth < 768)
+      check()
+      window.addEventListener('resize', check)
+      return () => window.removeEventListener('resize', check)
+  }, [])
+  return isMobile
+}
 
 // --- Custom Shaders ---
 
@@ -131,6 +142,8 @@ const Particles = () => {
 }
 
 export default function SingularityDemo() {
+  const isMobile = useIsMobile()
+
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#000', overflow: 'hidden' }}>
       <Canvas camera={{ position: [0, 2, 12], fov: 45 }} gl={{ antialias: false }}>
@@ -166,19 +179,28 @@ export default function SingularityDemo() {
       {/* UI Overlay */}
       <div style={{
         position: 'absolute',
-        top: '30px',
-        left: '30px',
+        top: isMobile ? '20px' : '30px',
+        left: isMobile ? '20px' : '30px',
         color: 'white',
         fontFamily: "'Inter', sans-serif",
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        maxWidth: isMobile ? '80%' : 'auto'
       }}>
-        <Link to="/" style={{ color: '#94a3b8', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', pointerEvents: 'auto', marginBottom: '16px', fontSize: '0.9rem', fontWeight: '500' }}>
-            <ArrowLeft size={16} /> Back to Lab
+        <Link to="/" style={{ color: '#94a3b8', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', pointerEvents: 'auto', marginBottom: isMobile ? '10px' : '16px', fontSize: '0.9rem', fontWeight: '500' }}>
+            <ArrowLeft size={16} /> {isMobile ? 'Back' : 'Back to Lab'}
         </Link>
-        <h1 style={{ margin: 0, fontSize: '3rem', fontWeight: '900', letterSpacing: '0.2em', color: '#fff', textShadow: '0 0 20px rgba(255,255,255,0.5)' }}>
+        <h1 style={{ 
+            margin: 0, 
+            fontSize: isMobile ? '1.8rem' : '3rem', 
+            fontWeight: '900', 
+            letterSpacing: '0.2em', 
+            color: '#fff', 
+            textShadow: '0 0 20px rgba(255,255,255,0.5)',
+            lineHeight: 1.1
+        }}>
           SINGULARITY
         </h1>
-        <div style={{ fontSize: '0.8rem', color: '#f59e0b', letterSpacing: '2px', marginTop: '5px' }}>
+        <div style={{ fontSize: isMobile ? '0.7rem' : '0.8rem', color: '#f59e0b', letterSpacing: '2px', marginTop: '5px' }}>
           EVENT HORIZON SIMULATION
         </div>
       </div>

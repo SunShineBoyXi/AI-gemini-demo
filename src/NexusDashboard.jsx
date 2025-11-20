@@ -31,6 +31,17 @@ const CameraController = ({ targetPosition }) => {
     return null
 }
 
+const useIsMobile = () => {
+    const [isMobile, setIsMobile] = useState(false)
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768)
+        check()
+        window.addEventListener('resize', check)
+        return () => window.removeEventListener('resize', check)
+    }, [])
+    return isMobile
+}
+
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 
@@ -38,6 +49,7 @@ function App() {
   // Mock Data Stream
   const [streamData, setStreamData] = useState([])
   const [focusTarget, setFocusTarget] = useState(null)
+  const isMobile = useIsMobile()
   
   useEffect(() => {
       const interval = setInterval(() => {
@@ -64,6 +76,7 @@ function App() {
 
         <HoloGlobe 
             radius={3.5} 
+            isMobile={isMobile}
             onMarkerClick={(pos) => {
                 // When clicking a marker, set it as the new focus target
                 // Add a slight offset to y so we don't look directly edge-on if we don't want to
@@ -98,22 +111,29 @@ function App() {
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        padding: '30px',
+        padding: isMobile ? '15px' : '30px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         fontFamily: "'Rajdhani', 'Segoe UI', sans-serif",
-        color: '#fff'
+        color: '#fff',
+        overflowY: isMobile ? 'auto' : 'hidden'
       }}>
         
         {/* Top Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: isMobile ? 'flex-start' : 'flex-start',
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: isMobile ? '20px' : '0'
+        }}>
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
                 <Link to="/" style={{ color: '#94a3b8', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #334155', padding: '8px 12px', borderRadius: '8px', background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(4px)', pointerEvents: 'auto' }}>
-                    <ArrowLeft size={16} /> Back
+                    <ArrowLeft size={16} /> {isMobile ? '' : 'Back'}
                 </Link>
                 <div>
-                    <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 700, letterSpacing: '4px', color: '#fff' }}>
+                    <h1 style={{ margin: 0, fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 700, letterSpacing: '4px', color: '#fff' }}>
                     NEXUS<span style={{ color: '#3b82f6' }}>CORE</span>
                 </h1>
                 <div style={{ fontSize: '0.8rem', color: '#64748b', letterSpacing: '2px' }}>
@@ -121,7 +141,7 @@ function App() {
                 </div>
             </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
+            <div style={{ textAlign: isMobile ? 'left' : 'right', paddingLeft: isMobile ? '60px' : '0' }}>
                 <div style={{ fontSize: '1.5rem', fontFamily: 'monospace', color: '#3b82f6' }}>
                     {new Date().toLocaleTimeString()}
                 </div>
@@ -147,17 +167,31 @@ function App() {
         </div>
 
         {/* Middle Content */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', flex: 1, alignItems: 'center' }}>
+        <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            flex: 1, 
+            alignItems: isMobile ? 'flex-end' : 'center',
+            flexDirection: isMobile ? 'column' : 'row',
+            paddingTop: isMobile ? '40px' : '0',
+            pointerEvents: 'none'
+        }}>
             
             {/* Left Stats */}
-            <div style={{ width: '250px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{ 
+                width: isMobile ? '100%' : '250px', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '15px',
+                marginBottom: isMobile ? '20px' : '0'
+            }}>
                 <StatCard label="TOTAL NODES" value="84,291" color="#3b82f6" />
                 <StatCard label="ACTIVE SESSIONS" value="12.4M" color="#10b981" />
                 <StatCard label="BANDWIDTH USAGE" value="842 TB/s" color="#f59e0b" />
             </div>
 
             {/* Right Logs */}
-            <div style={{ width: '300px' }}>
+            <div style={{ width: isMobile ? '100%' : '300px' }}>
                 <div style={{ 
                     background: 'rgba(10,10,20,0.6)', 
                     borderLeft: '2px solid #3b82f6', 
@@ -178,12 +212,14 @@ function App() {
         </div>
 
         {/* Bottom Footer */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', fontSize: '0.8rem', color: '#475569' }}>
-            <div>CPU LOAD: 12%</div>
-            <div>GPU LOAD: 48%</div>
-            <div>MEMORY: 64GB / 128GB</div>
-            <div>LATENCY: 14ms</div>
-        </div>
+        {!isMobile && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', fontSize: '0.8rem', color: '#475569' }}>
+                <div>CPU LOAD: 12%</div>
+                <div>GPU LOAD: 48%</div>
+                <div>MEMORY: 64GB / 128GB</div>
+                <div>LATENCY: 14ms</div>
+            </div>
+        )}
 
       </div>
     </div>

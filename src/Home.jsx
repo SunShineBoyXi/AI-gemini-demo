@@ -74,17 +74,30 @@ const AnimatedBackground = ({ theme }) => {
 
 // --- UI Components ---
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+  return isMobile
+}
+
 const CustomCursor = () => {
   const cursorRef = useRef(null)
   const [isHovering, setIsHovering] = useState(false)
-  
+  const isMobile = useIsMobile()
+
   useEffect(() => {
+    if (isMobile) return 
+
     const moveCursor = (e) => {
       if (cursorRef.current) {
         cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
       }
       
-      // Simple hover detection for interactive elements
       const target = e.target
       const isClickable = 
         target.tagName === 'BUTTON' || 
@@ -98,7 +111,9 @@ const CustomCursor = () => {
     
     window.addEventListener('mousemove', moveCursor)
     return () => window.removeEventListener('mousemove', moveCursor)
-  }, [])
+  }, [isMobile])
+
+  if (isMobile) return null
 
   return (
     <div 
@@ -109,7 +124,7 @@ const CustomCursor = () => {
         left: 0,
         width: isHovering ? '48px' : '20px',
         height: isHovering ? '48px' : '20px',
-        marginLeft: isHovering ? '-24px' : '-10px', // Center the cursor based on size
+        marginLeft: isHovering ? '-24px' : '-10px',
         marginTop: isHovering ? '-24px' : '-10px',
         borderRadius: '50%',
         border: '2px solid white',
@@ -224,7 +239,7 @@ const THEMES = {
   }
 }
 
-const ProjectCard = ({ title, description, path, category, icon: Icon, color, theme, index }) => {
+const ProjectCard = ({ title, description, path, category, icon: Icon, color, theme, index, isMobile }) => {
   const t = THEMES[theme]
   const [isHovered, setIsHovered] = useState(false)
   
@@ -239,7 +254,7 @@ const ProjectCard = ({ title, description, path, category, icon: Icon, color, th
       }}
     >
       <div
-        onMouseEnter={() => setIsHovered(true)}
+        onMouseEnter={() => !isMobile && setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         style={{
           position: 'relative',
@@ -353,6 +368,7 @@ const ProjectCard = ({ title, description, path, category, icon: Icon, color, th
 export default function Home() {
   const [theme, setTheme] = useState('dark')
   const t = THEMES[theme]
+  const isMobile = useIsMobile()
   
   return (
     <div style={{ 
@@ -362,7 +378,7 @@ export default function Home() {
       fontFamily: "'Inter', sans-serif",
       overflowX: 'hidden',
       transition: 'background 0.5s ease',
-      cursor: 'none' // Hide default cursor
+      cursor: isMobile ? 'auto' : 'none' // Hide default cursor only on desktop
     }}>
       
       <CustomCursor />
@@ -372,7 +388,7 @@ export default function Home() {
 
       {/* Navigation */}
       <nav style={{
-        padding: '24px 40px',
+        padding: isMobile ? '20px' : '24px 40px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -384,12 +400,14 @@ export default function Home() {
           <span style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.02em' }}>RBL STUDIO</span>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
-            <div style={{ display: 'flex', gap: '32px' }}>
-                <NavLink text="Work" theme={theme} />
-                <NavLink text="Laboratory" theme={theme} />
-                <NavLink text="About" theme={theme} />
-            </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '20px' : '40px' }}>
+            {!isMobile && (
+              <div style={{ display: 'flex', gap: '32px' }}>
+                  <NavLink text="Work" theme={theme} />
+                  <NavLink text="Laboratory" theme={theme} />
+                  <NavLink text="About" theme={theme} />
+              </div>
+            )}
 
             <button 
             onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
@@ -417,7 +435,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <header style={{ 
-        padding: '80px 40px', 
+        padding: isMobile ? '120px 20px 80px' : '80px 40px 120px', 
         maxWidth: '1400px', 
         margin: '0 auto',
         position: 'relative',
@@ -426,7 +444,7 @@ export default function Home() {
         <div 
           className="animate-fade-up"
           style={{ 
-            fontSize: 'clamp(3.5rem, 10vw, 8rem)', 
+            fontSize: 'clamp(2.5rem, 12vw, 8rem)', 
             fontWeight: 900, 
             lineHeight: 0.95, 
             letterSpacing: '-0.04em',
@@ -449,13 +467,13 @@ export default function Home() {
           style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-            gap: '60px',
+            gap: isMobile ? '30px' : '60px',
             maxWidth: '1000px',
             animationDelay: '0.15s'
           }}
         >
           <p style={{ 
-            fontSize: '1.25rem', 
+            fontSize: isMobile ? '1.1rem' : '1.25rem', 
             color: t.textSecondary, 
             lineHeight: 1.5,
             borderLeft: `2px solid ${t.accent}`,
@@ -468,7 +486,7 @@ export default function Home() {
 
         <div style={{
           position: 'absolute',
-          bottom: '-60px',
+          bottom: isMobile ? '-40px' : '-60px',
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
@@ -485,7 +503,7 @@ export default function Home() {
 
       {/* Projects Section */}
       <section style={{ 
-        padding: '0 40px 120px', 
+        padding: isMobile ? '0 20px 80px' : '0 40px 120px', 
         maxWidth: '1400px', 
         margin: '0 auto',
         position: 'relative',
@@ -493,8 +511,8 @@ export default function Home() {
       }}>
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-          gap: '32px' 
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(400px, 1fr))', 
+          gap: isMobile ? '20px' : '32px' 
         }}>
           <ProjectCard 
             index={0}
@@ -505,6 +523,7 @@ export default function Home() {
             icon={Globe}
             color="#3b82f6"
             theme={theme}
+            isMobile={isMobile}
           />
           <ProjectCard 
             index={1}
@@ -515,6 +534,7 @@ export default function Home() {
             icon={Zap}
             color="#f59e0b"
             theme={theme}
+            isMobile={isMobile}
           />
           <ProjectCard 
             index={2}
@@ -525,6 +545,7 @@ export default function Home() {
             icon={Box}
             color="#ef4444"
             theme={theme}
+            isMobile={isMobile}
           />
           <ProjectCard 
             index={3}
@@ -535,13 +556,14 @@ export default function Home() {
             icon={Activity}
             color="#10b981"
             theme={theme}
+            isMobile={isMobile}
           />
         </div>
       </section>
 
       {/* Footer */}
       <footer style={{
-        padding: '100px 40px 60px',
+        padding: isMobile ? '60px 20px 40px' : '100px 40px 60px',
         borderTop: `1px solid ${t.border}`,
         background: theme === 'dark' ? 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.5))' : 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.05))',
         position: 'relative',
@@ -551,6 +573,7 @@ export default function Home() {
           <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
+            flexDirection: isMobile ? 'column' : 'row',
             flexWrap: 'wrap', 
             gap: '60px',
             marginBottom: '80px'
@@ -575,6 +598,7 @@ export default function Home() {
                 fontWeight: 600,
                 cursor: 'pointer',
                 transition: 'transform 0.2s ease',
+                width: isMobile ? '100%' : 'auto'
               }}
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
@@ -583,7 +607,7 @@ export default function Home() {
               </button>
             </div>
 
-            <div style={{ display: 'flex', gap: '60px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '60px', flexWrap: 'wrap', flexDirection: isMobile ? 'column' : 'row' }}>
               <div>
                 <h4 style={{ color: t.textSecondary, fontSize: '0.875rem', fontWeight: 600, marginBottom: '24px', letterSpacing: '1px' }}>SOCIALS</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

@@ -71,3 +71,27 @@ html, body, #root {
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
+
+@media (max-width: 768px) {
+  /* Hide custom scrollbar on mobile for native feel */
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+  
+  /* Prevent text selection on mobile for app-like feel */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  
+  p, h1, h2, h3, h4, h5, h6, input, textarea {
+    user-select: text;
+  }
+
+  /* Better touch targets */
+  button, a {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+}
