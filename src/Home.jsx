@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, Stars, PerspectiveCamera } from '@react-three/drei'
 import * as THREE from 'three'
-import { ArrowUpRight, Globe, Activity, Zap, Box, Layers, Moon, Sun, Hexagon } from 'lucide-react'
+import { ArrowUpRight, Globe, Activity, Zap, Box, Layers, Moon, Sun, Hexagon, Brain, Building2, Droplets, Truck, Trees } from 'lucide-react'
 
 // --- 3D Background Components ---
 const ParticleField = ({ count = 100, color = '#4f46e5' }) => {
@@ -555,6 +555,61 @@ export default function Home() {
             path="/dumbbell"
             icon={Activity}
             color="#10b981"
+            theme={theme}
+            isMobile={isMobile}
+          />
+          <ProjectCard 
+            index={4}
+            title="Neural Swarm"
+            description="A mesmerizing particle system simulating neural networks and hive mind intelligence."
+            category="AI Visualization"
+            path="/neural"
+            icon={Brain}
+            color="#00ffaa"
+            theme={theme}
+            isMobile={isMobile}
+          />
+          <ProjectCard 
+            index={5}
+            title="Cyber City"
+            description="Infinite procedural metropolis generation with retro-future aesthetics and bloom effects."
+            category="Procedural Gen"
+            path="/cybercity"
+            icon={Building2}
+            color="#d946ef"
+            theme={theme}
+            isMobile={isMobile}
+          />
+          <ProjectCard 
+            index={6}
+            title="Liquid Chrome"
+            description="Real-time environment mapping and distortion shaders creating a fluid metal experience."
+            category="WebGL Shader"
+            path="/liquid"
+            icon={Droplets}
+            color="#94a3b8"
+            theme={theme}
+            isMobile={isMobile}
+          />
+          <ProjectCard 
+            index={7}
+            title="Smart Logistics"
+            description="Digital twin of an automated warehouse with real-time AGV tracking and data overlays."
+            category="Enterprise / IoT"
+            path="/logistics"
+            icon={Truck}
+            color="#3b82f6"
+            theme={theme}
+            isMobile={isMobile}
+          />
+          <ProjectCard 
+            index={8}
+            title="Magic Forest"
+            description="Interactive 3D learning environment for children with playful animations and sound."
+            category="Education / Kids"
+            path="/forest"
+            icon={Trees}
+            color="#22c55e"
             theme={theme}
             isMobile={isMobile}
           />
